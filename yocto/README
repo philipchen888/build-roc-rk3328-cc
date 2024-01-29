@@ -1,0 +1,80 @@
+Build yocto sdcard image for roc-rk3328-cc:
+
+   mkdir ${HOME}/download
+   mkdir ${HOME}/sstate-cache
+   git clone https://github.com/radxa/kernel.git --depth=1 -b release-4.4-rockpi4
+   mv kernel kernel.git
+   \rm -rf kernel.git/.git
+   git clone git://git.yoctoproject.org/poky --depth=1 -b dunfell
+   cd poky
+   git clone git://git.openembedded.org/meta-openembedded.git --depth=1 -b dunfell
+   git clone https://github.com/radxa/meta-radxa.git --depth=1 -b dunfell
+   git clone https://github.com/YoeDistro/meta-python2.git --depth=1 -b dunfell
+   source oe-init-build-env
+   cd ../../
+   make get_kernel
+   vi ./patches/linux-rockchip_4.4.bb ( change SRC_URI kernel path to your path )
+   vi ./patches/rk3328-gpt-img.bbclass ( change rk3328.conf to your path )
+   make apply_patches
+
+   cd poky; source oe-init-build-env;
+   bitbake -s
+   bitbake -c cleansstate rk3328-desktop-image
+   bitbake -k rk3328-desktop-image
+
+   The result is in ./tmp/deploy/images/rockchip-rk3328-evb/rk3328-desktop-image-rockchip-rk3328-evb-gpt.img
+
+   sudo dd if=./tmp/deploy/images/rockchip-rk3328-evb/rk3328-desktop-image-rockchip-rk3328-evb-gpt.img of=/dev/sda bs=4096 conv=notrunc,fsync
+
+   Eject sdcard. Plugin sdcard again.
+   sudo vi /media/$USER/*/etc/network/interfaces ( delete everything after iface lo inet loopback )
+   sync
+   Eject sdcard.
+
+   \rm -rf ./tmp/work
+
+Plugin usb wifi dongle and usb bluetooth dongle to SBC.
+plugin sdcard to SBC
+login:
+username: root
+password: rock
+
+nmcli dev wifi connect "SSID" password "PASSWORD"
+
+\rm /etc/localtime
+ln -s /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
+date
+
+adduser linaro
+
+aplay -l
+vi /etc/asound.conf ( add
+pcm.!default {
+type hw
+card 1
+}
+ctl.!default {
+type hw
+card 1
+}
+
+To disable screen blank:
+vi /etc/rc.local ( add
+#!/bin/sh
+/usr/bin/xset -dpms s off s noblank s 0 0 s noexpose
+
+chmod 755 /etc/rc.local
+sync
+reboot
+
+source /etc/rc.local
+
+glmark2-es2-drm
+
+aplay /home/linaro/yoursong.wav
+mpv --no-video /home/linaro/yoursong.mp3
+mpv /home/linaro/yourvideo.mp4
+
+rfkill unblock bluetooth
+hcitool dev
+hciconfig -a
