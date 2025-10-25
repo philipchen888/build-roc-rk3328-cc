@@ -1,6 +1,6 @@
 Compile uboot:
 
-git clone https://github.com/u-boot/u-boot.git -b u-boot-2023.07.y
+git clone https://github.com/u-boot/u-boot.git -b master --depth=1
 mkdir out
 make u-boot
 

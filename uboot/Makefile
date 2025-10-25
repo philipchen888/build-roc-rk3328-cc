@@ -1,6 +1,6 @@
 export ARCH=arm64
 export OUT=$(PWD)/out
-export CROSS_COMPILE=/usr/local/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
+export CROSS_COMPILE=/usr/bin/aarch64-linux-gnu-
 export BL31=$(PWD)/rkbin/rk33/rk3328_bl31_v1.34.bin
 
 u-boot: cleanuboot builduboot postbuilduboot
@@ -15,7 +15,7 @@ builduboot:
 	cd u-boot; \
 	make clean; \
 	make ARCH=arm64 roc-cc-rk3328_defconfig; \
-	make all
+	make all -j1
 
 postbuilduboot:
 	cd u-boot; \

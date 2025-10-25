@@ -1,5 +1,5 @@
 export BOARD=rk3328
-export LB_BOOTSTRAP_INCLUDE="apt-transport-https gnupg"
+export LB_BOOTSTRAP_INCLUDE="apt-transport-https"
 export ARCH=arm64
 export CROSS_COMPILE=/usr/bin/aarch64-linux-gnu-
 
@@ -11,7 +11,7 @@ clean:
 
 cleanall:
 	sudo lb clean --purge
-	\rm -rf config .build rootfs local
+	\rm -rf config .build rootfs
 	\rm -rf linaro-rootfs.img
 
 prebuild:
@@ -20,27 +20,26 @@ prebuild:
 	--apt-recommends false \
 	--apt-secure false \
 	--architectures arm64 \
-	--archive-areas 'main non-free-firmware' \
+	--archive-areas 'main restricted universe multiverse' \
 	--backports false \
 	--binary-filesystem ext4 \
 	--binary-images tar \
-	--bootappend-live "hostname=linaro-alip username=linaro" \
 	--bootstrap-qemu-arch arm64 \
 	--bootstrap-qemu-static /usr/bin/qemu-aarch64-static \
 	--cache false \
 	--chroot-filesystem none \
 	--compression gzip \
-	--debootstrap-options "--variant=minbase --include=apt-transport-https,gnupg" \
-	--distribution bookworm \
+	--distribution noble \
 	--gzip-options '-9 --rsyncable' \
+	--keyring-packages ubuntu-keyring \
 	--linux-flavours none \
 	--linux-packages none \
-	--parent-mirror-binary 'http://ftp.us.debian.org/debian/' \
-	--parent-mirror-binary-security 'http://security.debian.org/debian-security/' \
-	--parent-mirror-bootstrap 'http://ftp.us.debian.org/debian/' \
-	--parent-mirror-chroot 'http://ftp.us.debian.org/debian/' \
-	--parent-mirror-chroot-security 'http://security.debian.org/debian-security/' \
-	--mode debian \
+	--parent-mirror-binary 'http://ports.ubuntu.com/ubuntu-ports/' \
+	--parent-mirror-binary-security 'http://ports.ubuntu.com/ubuntu-ports/' \
+	--parent-mirror-bootstrap 'http://ports.ubuntu.com/ubuntu-ports/' \
+	--parent-mirror-chroot 'http://ports.ubuntu.com/ubuntu-ports/' \
+	--parent-mirror-chroot-security 'http://ports.ubuntu.com/ubuntu-ports/' \
+	--mode ubuntu \
 	--security true \
 	--system normal
 
@@ -50,7 +49,7 @@ buildrootfs:
 	sudo lb build
 
 postbuild:
-	ARCH=arm64 $(PWD)/../mk-rootfs-bookworm.sh
+	ARCH=arm64 $(PWD)/../mk-rootfs-ubuntu-noble.sh
 
 mkimage:
 	$(PWD)/../mk-image.sh

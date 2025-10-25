@@ -12,7 +12,7 @@ bluetooth
 bzip2
 ca-certificates
 console-setup
-cpufrequtils
+# cpufrequtils
 curl
 dbus
 #dbus-x11
@@ -25,7 +25,7 @@ eject
 evtest
 fbset
 file
-gconf2
+# gconf2
 gdisk
 git
 gstreamer1.0-libav
@@ -38,8 +38,8 @@ hardinfo
 hostapd
 idlestat
 ifupdown
-#initramfs-tools
-initscripts
+# initramfs-tools
+# initscripts
 input-utils
 iotop
 iperf
@@ -56,9 +56,9 @@ locales
 lsb-release
 lsof
 desktop-base
-policykit-1
+# policykit-1
 network-manager
-makedev
+# makedev
 mawk
 mesa-utils
 mesa-utils-extra
@@ -68,8 +68,9 @@ libgl1-mesa-dri
 net-tools
 netbase
 netcat-openbsd
-ntp
-ntpdate
+# ntp
+# ntpdate
+chrony
 obconf
 openssh-client
 openssh-server
@@ -138,7 +139,7 @@ gnome-control-center
 nautilus
 gnome-icon-theme
 gnome-settings-daemon
-# gnome-session-xsession
+gnome-session-xsession
 libproxy1-plugin-networkmanager
 network-manager-gnome
 xfce4-power-manager-plugins
@@ -152,8 +153,8 @@ libwayland-dev
 wayland-protocols
 libdrm-dev
 libfm4
-libfm-gtk4
-software-properties-common
+# libfm-gtk4
+# software-properties-common
 pipewire
 wireplumber
 pipewire-pulse

@@ -1,0 +1,64 @@
+Build ubuntu-noble sdcard for roc-rk3328-cc:
+
+Input files: ../uboot/out/idbloader.img
+             ../uboot/out/uboot.img
+             ../uboot/out/trust.img
+             ../linux/out/boot.img
+             ../rootfs-ubuntu-noble/linaro-rootfs.img
+
+cd ~/build-roc-rk3328-cc/ubuntu-noble
+Plugin sdcard to PC.
+sudo ./mksdcardimg.sh
+Eject sdcard from PC.
+
+Plugin sdcard, ethernet cable and ASUS bluetooth usb dongle to SBC.
+Login:
+Username: linaro
+Password: linaro
+Disable power saving and screen saver.
+uname -a
+lsb_release -a
+sudo ifconfig
+sudo dpkg-reconfigure tzdata
+sudo dpkg-reconfigure locales
+date
+sudo apt update
+sudo apt upgrade
+sudo apt dist-upgrade
+sync
+free
+glxinfo | grep OpenGL
+Check display mode: ( wayland or x11 )
+echo $XDG_SESSION_TYPE
+
+sudo apt install speedtest-cli python3-pip python3-setuptools vlc vlc-plugin-video-output ffmpeg mpv glmark2-es2-x11 pandoc
+
+speedtest-cli --secure
+
+glmark2-es2
+
+aplay -l
+pavucontrol
+
+sudo add-apt-repository ppa:mozillateam/ppa
+sudo apt update; sudo apt upgrade -y;
+sudo apt install firefox-esr
+firefox-esr -> youtube.com -> search YmDNhi07_Ho
+
+Do follows on PC, then ftp swan.mp4 to roc-rk3328-cc.
+(
+git clone https://github.com/yt-dlp/yt-dlp.git
+cd yt-dlp
+make
+cd ../
+~/yt-dlp/yt-dlp -f 'bestvideo[ext=mp4][protocol=https]+bestaudio[ext=m4a][protocol=https]' 3qrKjywjo7Q -o swan.mp4 --postprocessor-args "-vf scale=1024:640 -r 10 -c:v libx264 -b:v 2M -c:a copy"
+)
+
+mpv --hwdec=auto-copy swan.mp4
+ffplay swan.mp4
+cvlc --gl=wgl --glconv=any swan.mp4
+
+sudo rfkill list
+hciconfig hci0
+hcitool dev
+hciconfig -a

@@ -2,24 +2,26 @@ export OUT=$(PWD)/out
 export BOOT=$(OUT)/boot.img
 export ARCH=arm64
 export CROSS_COMPILE=/usr/bin/aarch64-linux-gnu-
+export BOOT_UUID=95E46EA5
 
 kernel: buildkernel postbuildkernel
 
 clean:
-	cd kernel; \
-	sudo make ARCH=arm64 clean
+	cd linux; \
+	sudo make mrproper
 
 buildkernel:
-	cd kernel; \
+	cd linux; \
 	sudo \rm -rf tmp; mkdir tmp; mkdir -p tmp/lib; \
-	make ARCH=arm64 clean; \
-	make ARCH=arm64 defconfig; \
-	make ARCH=arm64 all -j8;
-	cd kernel; \
-	sudo make ARCH=arm64 INSTALL_MOD_PATH=./tmp modules_install
+	sudo make mrproper; \
+	make defconfig; \
+	make all -j8; \
+	sudo make ARCH=arm64 INSTALL_MOD_PATH=./tmp modules_install; \
+	sudo make ARCH=arm64 INSTALL_DTBS_PATH=./tmp/boot/dtb dtbs_install; \
+	sudo make ARCH=arm64 INSTALL_PATH=./tmp/boot install
 
 postbuildkernel:
-	cd kernel; \
+	cd linux; \
 	\rm -f $(BOOT); \
 	mkfs.vfat -n "boot" -S 512 -C ${BOOT} 102400; \
 	mmd -i ${BOOT} ::/extlinux; \

@@ -31,7 +31,7 @@ prebuild:
 	--chroot-filesystem none \
 	--compression gzip \
 	--debootstrap-options "--variant=minbase --include=apt-transport-https,gnupg" \
-	--distribution bookworm \
+	--distribution trixie \
 	--gzip-options '-9 --rsyncable' \
 	--linux-flavours none \
 	--linux-packages none \
@@ -50,7 +50,7 @@ buildrootfs:
 	sudo lb build
 
 postbuild:
-	ARCH=arm64 $(PWD)/../mk-rootfs-bookworm.sh
+	ARCH=arm64 $(PWD)/../mk-rootfs-trixie.sh
 
 mkimage:
 	$(PWD)/../mk-image.sh

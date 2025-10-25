@@ -1,8 +1,7 @@
 Compile vendor's kernel:
 
-git clone https://github.com/FireflyTeam/kernel --depth=1 -b rk3328/firefly
-cd kernel; mkdir tmp; cd tmp; mkdir lib;
-cd ../../; mkdir out;
+git clone https://github.com/radxa/kernel.git --depth=1 -b linux-6.17.1
+\rm -rf out; mkdir out;
 make kernel
 
 The result is in ./out/boot.img

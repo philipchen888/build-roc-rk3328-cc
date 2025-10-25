@@ -19,7 +19,7 @@ if [ ! $VERSION ]; then
 	VERSION="release"
 fi
 
-if [ ! -e live-image-$ARCH.tar.tar.gz ]; then
+if [ ! -e binary-tar.tar.gz ]; then
 	echo "\033[36m Run sudo lb build first \033[0m"
 fi
 
@@ -33,7 +33,7 @@ finish() {
 trap finish ERR
 
 echo -e "\033[36m Extract image \033[0m"
-sudo tar -xpf live-image-$ARCH.tar.tar.gz
+sudo tar -xpf binary-tar.tar.gz
 
 sudo cp -rf ../linux/linux/tmp/lib/modules $TARGET_ROOTFS_DIR/lib
 
@@ -75,9 +75,10 @@ apt-get install -f -y
 /usr/sbin/useradd -d /home/linaro -G adm,sudo,video -m -N -u 29999 linaro
 echo -e "linaro:linaro" | chpasswd
 echo -e "linaro-alip" | tee /etc/hostname
+touch "/var/lib/oem-config/run"
 
-# Default gnome-xorg.desktop
-sed -i 's/#WaylandEnable=false/WaylandEnable=false/g' /etc/gdm3/daemon.conf
+# Disable wayland session
+sed -i 's/#WaylandEnable=false/WaylandEnable=false/g' /etc/gdm3/custom.conf
 rm -f /usr/share/wayland-sessions/ubuntu*.desktop /usr/share/wayland-sessions/gnome*.desktop
 
 systemctl disable gdm3

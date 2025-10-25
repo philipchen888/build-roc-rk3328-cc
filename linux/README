@@ -1,0 +1,30 @@
+Compile mainline kernel:
+
+wget https://git.kernel.org/torvalds/t/linux-6.17-rc7.tar.gz
+tar -xzf linux-6.17-rc7.tar.gz
+mv linux-6.17-rc7 linux
+vi linux/arch/arm64/boot/dts/rockchip/rk3328-roc.dtsi ( change to:
+&i2c1 {
+        status = "okay";
+
+&uart1 {
+        status = "okay";
+};
+
+&spi0 {
+        status = "okay";
+        spidev@0 {
+                compatible = "cisco,spi-petra";
+                reg = <0>;
+                spi-max-frequency = <10000000>;
+        };
+};
+
+&pwm2 {
+        status = "okay";
+};
+)
+\rm -rf out; mkdir out;
+make kernel
+
+The result is in ./out/boot.img
