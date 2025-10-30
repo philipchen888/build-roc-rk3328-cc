@@ -1,0 +1,49 @@
+Build fedora sdcard image for roc-rk3328-cc:
+
+cd ~/Downloads
+wget https://archives.fedoraproject.org/pub/archive/fedora/linux/releases/38/Workstation/aarch64/images/Fedora-Workstation-38-1.6.aarch64.raw.xz
+
+Plugin sdcard to PC. 
+sudo ./mksdcardimg.sh
+sudo mkfs.vfat /dev/sda1
+sudo mkfs.ext4 /dev/sda2
+sudo mkfs.ext4 /dev/sda3
+sudo fdisk -l /dev/sda
+xzcat ~/Downloads/Fedora-Workstation-38-1.6.aarch64.raw.xz | sudo dd status=progress bs=4096 of=/dev/sda skip=256 seek=4096 conv=notrunc,fsync
+Eject sdcard from PC.
+
+Plugin sdcard to roc-rk3328-cc. Plugin ethernet cable to roc-rk3328-cc. Power on roc-rk3328-cc.
+
+Disable power saving and screen saver.
+
+sudo btrfs filesystem resize max /
+df .
+uname -a
+cat /etc/fedora-release
+rpm -qa | grep -i kernel
+sudo dnf install kernel-devel-6.2.9-300.fc38.aarch64
+rpm -qa | grep -i kernel
+add: exclude=kernel* to /etc/dnf/dnf.conf
+sudo dnf update                             ( It may take 1.5 hours )
+sudo grub2-editenv create
+sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+sudo sudo grubby --set-default /boot/vmlinuz-6.2.9-300.fc38.aarch64
+sudo grubby --default-kernel
+sudo grubby --info DEFAULT
+sudo grubby --info /boot/vmlinuz-6.2.9-300.fc38.aarch64
+sudo ls -l /boot/loader/entries
+sync
+free
+sudo reboot
+
+click small circle, select gnome on xorg
+echo $XDG_SESSION_TYPE
+df .
+uname -a
+sudo dnf install speedtest-cli glmark2 mpv yt-dlp pavucontrol openssl-devel vsftpd vlc pandoc
+
+glmark2-es2
+speedtest-cli
+
+aplay -l
+pavucontrol  ( select hdmi as default )

@@ -3,7 +3,7 @@ Build trixie-gnome sdcard for roc-rk3328-cc:
 Input files: ../uboot/out/idbloader.img
              ../uboot/out/uboot.img
              ../uboot/out/trust.img
-             ../linux/out/boot.img
+             ../rootfs-trixie/linaro-esp.img
              ../rootfs-trixie/linaro-rootfs.img
 
 cd ~/build-roc-rk3328-cc/trixie-gnome
@@ -27,8 +27,12 @@ sudo apt upgrade
 sync
 free
 glxinfo | grep OpenGL
+Check if Debian is running UEFI mode:
+ls /sys/firmware/efi
 Check display mode: ( wayland or x11 )
 echo $XDG_SESSION_TYPE
+Check audio driver: ( pulseaudio or pipewire )
+pactl info
 
 sudo apt install speedtest-cli python3-pip python3-setuptools chromium chromium-sandbox vlc vlc-plugin-video-output ffmpeg mpv glmark2-es2-x11 pandoc
 

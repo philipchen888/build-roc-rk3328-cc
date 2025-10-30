@@ -5,6 +5,7 @@ Parts needed:
 2. Sandisk 64GB micro sdcard.
 3. Host PC with ubuntu 24.
 4. ASUS USB-BT500 bluetooth usb dongle.
+5. USB3 1TB SSD.
 
 Steps to build ROC-RK3338-CC sdcard image:
 
@@ -89,18 +90,24 @@ Steps to build ROC-RK3338-CC sdcard image:
     sudo ./mksdcardimg.sh
     Eject sdcard from PC.
 
-14. cd ~/build-roc-rk3328-cc/yocto  ( Build yocto image )
+14. cd ~/build-roc-rk3328-cc/fedora                ( Build fedora image )
 
-15. cd ~/build-roc-rk3328-cc/yocto-lxde  ( Build yocto lxde-desktop image )
+15. cd ~/build-roc-rk3328-cc/bookworm-uefi         ( Build bookworm-uefi image )
 
-16. cd ~/build-roc-rk3328-cc/yocto-xfce  ( Build yocto xfce-desktop image )
+16. cd ~/build-roc-rk3328-cc/ubuntu-uefi           ( Build ubuntu-uefi image )
 
-17. cd ~/build-roc-rk3328-cc/buildroot   ( Build buildroot image )
+17. cd ~/build-roc-rk3328-cc/yocto                 ( Build yocto image )
 
-18. cd ~/build-roc-rk3328-cc/bullseye-gpio  ( gpio test in bullseye-lxde )
+18. cd ~/build-roc-rk3328-cc/yocto-lxde            ( Build yocto lxde-desktop image )
 
-19. cd ~/build-roc-rk3328-cc/bullseye-pn532nfc  ( pn532nfc test in bullseye-lxde )
+19. cd ~/build-roc-rk3328-cc/yocto-xfce            ( Build yocto xfce-desktop image )
 
-20. cd ~/build-roc-rk3328-cc/bullseye-flightaware  ( flightaware in bullseye-lxde ) 
+20. cd ~/build-roc-rk3328-cc/buildroot             ( Build buildroot image )
 
-21. cd ~/build-roc-rk3328-cc/baremetal-gpio  ( gpio test in baremetal )
+21. cd ~/build-roc-rk3328-cc/bullseye-gpio         ( gpio test in bullseye-lxde )
+
+22. cd ~/build-roc-rk3328-cc/bullseye-pn532nfc     ( pn532nfc test in bullseye-lxde )
+
+23. cd ~/build-roc-rk3328-cc/bullseye-flightaware  ( flightaware in bullseye-lxde ) 
+
+24. cd ~/build-roc-rk3328-cc/baremetal-gpio        ( gpio test in baremetal )

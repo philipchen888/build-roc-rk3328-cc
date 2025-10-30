@@ -40,6 +40,11 @@ sudo cp -rf ../linux/linux/tmp/lib/modules $TARGET_ROOTFS_DIR/lib
 # packages folder
 sudo mkdir -p $TARGET_ROOTFS_DIR/packages
 sudo cp -rf ../packages/$ARCH/* $TARGET_ROOTFS_DIR/packages
+sudo cp -rf ../linux/linux/tmp/boot/* $TARGET_ROOTFS_DIR/boot
+export KERNEL_VERSION=$(ls $TARGET_ROOTFS_DIR/boot/vmlinuz-* 2>/dev/null | sed 's|.*/vmlinuz-||' | sort -V | tail -n 1)
+echo $KERNEL_VERSION
+sudo sed -e "s/6.14.0-rc3/$KERNEL_VERSION/g" < ../linux/patches/40_custom_uuid | sudo tee $TARGET_ROOTFS_DIR/boot/40_custom_uuid > /dev/null
+cat $TARGET_ROOTFS_DIR/boot/40_custom_uuid
 
 # overlay folder
 sudo cp -rf ../overlay/* $TARGET_ROOTFS_DIR/
@@ -61,9 +66,34 @@ rm -rf /etc/resolv.conf
 echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" > /etc/resolv.conf
 resolvconf -u
 apt-get update
+rm -rf /etc/initramfs/post-update.d/z50-raspi-firmware
 apt-get upgrade -y
-apt-get install -y build-essential git wget v4l-utils lightdm lxde libegl1 libgles2 libgbm1 libgl1-mesa-dri libglx-mesa0 mesa-vdpau-drivers
+apt-get install -y build-essential git wget v4l-utils firmware-linux grub-efi-arm64 e2fsprogs zstd initramfs-tools lightdm lxde libegl1 libgles2 libgbm1 libgl1-mesa-dri libglx-mesa0 mesa-vdpau-drivers
 ldconfig
+
+mkdir -p /boot/efi
+grub-install --target=arm64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
+update-grub
+
+cp /boot/40_custom_uuid /etc/grub.d/
+chmod +x /etc/grub.d/40_custom_uuid
+rm -rf /boot/40_custom_uuid
+
+# Migrate extlinux.conf to GRUB
+rm -rf /boot/extlinux
+cat << GRUB_EOF > /etc/default/grub
+GRUB_DEFAULT="Boot from UUID"
+GRUB_TIMEOUT=5
+GRUB_CMDLINE_LINUX_DEFAULT="quiet"
+GRUB_CMDLINE_LINUX=""
+GRUB_EOF
+
+cat << FSTAB_EOF > /etc/fstab
+UUID=B921B045-1DF0-41C3-AF44-4C6F280D3FAE /  ext4    errors=remount-ro   0   1
+UUID=95E4-6EA5  /boot/efi  vfat    umask=0077      0       1
+FSTAB_EOF
+
+update-grub
 
 chmod o+x /usr/lib/dbus-1.0/dbus-daemon-launch-helper
 chmod +x /etc/rc.local
@@ -84,6 +114,7 @@ systemctl disable gdm3
 systemctl enable lightdm
 systemctl enable resize-helper
 chsh -s /bin/bash linaro
+update-initramfs -c -k $KERNEL_VERSION
 
 #---------------Clean--------------
 rm -rf /var/lib/apt/lists/*

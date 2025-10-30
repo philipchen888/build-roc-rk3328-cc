@@ -1,0 +1,115 @@
+Build ubuntu-uefi sdcard image for roc-rk3328-cc:
+
+-----------------------------------------------------------
+Download Ubuntu iso.
+-----------------------------------------------------------
+
+cd ~/Downloads
+wget https://cdimage.ubuntu.com/releases/plucky/release/ubuntu-25.04-latest-desktop-arm64.iso
+wget https://cdimage.ubuntu.com/releases/noble/release/ubuntu-24.04.3-desktop-arm64.iso
+
+cd ~/build-roc-rk3328-cc/ubuntu-uefi
+Plugin usb3 stick to PC.
+sudo ./mkusb3stick.sh
+sudo mkfs.vfat /dev/sda1
+sudo fdisk -l /dev/sda
+sudo mount /dev/sda1 /mnt
+sudo 7z x ~/Downloads/ubuntu-25.04-latest-desktop-arm64.iso -o/mnt && sync
+sudo cp ~/build-roc-rk3328-cc/linux/linux/tmp/boot/dtb/rockchip/rk3328-roc-cc.dtb /mnt/casper/dtbs
+sudo vi /mnt/boot/grub/grub.cfg ( change to:
+menuentry "Try or Install Ubuntu" {
+        set gfxpayload=keep
+        linux   /casper/vmlinuz $cmdline  --- quiet splash console=tty0
+        initrd  /casper/initrd
+        devicetree /casper/dtbs/rk3328-roc-cc.dtb
+}
+)
+sync; sudo umount /mnt;
+Eject usb3 stick from PC.
+
+Plugin sdcard to PC.
+sudo ./mkuboot.sh
+Eject sdcard from PC.
+
+------------------------------------------------------------------------
+Install ubuntu from usb3 stick ubuntu iso to sdcard.
+NOTE: To minimize EMI interference, put usb3 stick to roc-rk3328-cc USB3 socket.
+      Put keyboard mouse to roc-rk3328-cc bottom USB2 socket with USB2 extention cable.
+------------------------------------------------------------------------
+
+Plugin sdcard, usb3 stick and ethernet cable to roc-rk3328-cc. Power on roc-rk3328-cc.
+
+If something went wrong shows on screen click close, then click Install Release Icon.
+Double click Install Ubuntu LTS icon.
+Manual Installation. boot loader mmcblk1. Free space. + mount / ok.
+Click Install now.
+Contine till finished. Restart. Remove usb3 stick from roc-rk3328-cc.
+
+Plugin sdcard to PC.
+sudo fdisk -l /dev/sda
+sudo e2label /dev/sda5 rootfs
+sudo blkid /dev/sda4 ( write down UUID )
+sudo blkid /dev/sda5 ( write down UUID )
+sudo mount /dev/sda5 /mnt
+ls -la /mnt/boot
+sudo vi /mnt/boot/grub/grub.cfg ( delete everything, add
+set timeout=5
+set default="Boot UUID"
+set menu_color_normal=white/black
+set menu_color_highlight=white/green
+
+menuentry "Boot UUID" {
+    search --no-floppy --fs-uuid --set=root f6007ae7-470d-4625-9f77-8447fdbfb4d1
+    echo    'Loading Linux 6.14.0-35-generic ...'
+    linux /boot/vmlinuz-6.14.0-35-generic root=LABEL=rootfs rootwait rw rootdelay=10
+    echo    'Loading initial ramdisk ...'
+    initrd /boot/initrd.img-6.14.0-35-generic
+    devicetree /boot/dtb/rockchip/rk3328-roc-cc.dtb
+}
+)
+change above UUID accordingly.
+sudo cp -r ~/build-roc-rk3328-cc/linux/linux/tmp/boot/dtb /mnt/boot
+cd
+sync; sudo umount /mnt;
+Eject sdcard from PC.
+
+Plugin sdcard and ethernet cable to roc-rk3328-cc. Power on roc-rk3328-cc.
+Disable power saving and screen saver.
+sudo apt install net-tools openssh-server pulseaudio-utils
+sudo ifconfig
+df .
+uname -a
+lsb_release -a
+date
+sudo apt update
+sudo apt upgrade
+sudo apt dist-upgrade
+sync
+free
+sudo reboot
+
+Check if Ubuntu is running UEFI mode:
+ls /sys/firmware/efi
+
+sudo apt install flex bison libelf-dev libssl-dev build-essential libncurses-dev git speedtest-cli glmark2-es2-wayland mpv ffmpeg python3-pip python3-setuptools pandoc pavucontrol zip rfkill vsftpd vlc vlc-plugin-video-output
+
+speedtest-cli
+glmark2-es2-wayland
+
+aplay -l
+pavucontrol  ( select hdmi as default )
+
+firefox -> youtube -> search YmDNhi07_Ho
+
+Do follows on PC, then ftp swan.mp4 to roc-rk3328-cc.
+(
+git clone https://github.com/yt-dlp/yt-dlp.git
+cd yt-dlp
+make
+cd ../
+~/yt-dlp/yt-dlp -f 'bestvideo[ext=mp4][protocol=https]+bestaudio[ext=m4a][protocol=https]' 3qrKjywjo7Q -o swan.mp4 --postprocessor-args "-vf scale=1024:640 -r 10 -c:v libx264 -b:v 2M -c:a copy"
+)
+
+mpv --hwdec=auto-copy swan.mp4
+ffplay swan.mp4
+cvlc --gl=wgl --glconv=any swan.mp4
