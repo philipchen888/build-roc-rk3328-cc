@@ -1,49 +1,40 @@
 Build ubuntu-uefi sdcard image for roc-rk3328-cc:
 
+Note: Keyboard needs to have usb extention plugin to usb3 socket.
+      Plugin USB3 1TB SSD to top usb2 socket.
+
 -----------------------------------------------------------
 Download Ubuntu iso.
 -----------------------------------------------------------
 
 cd ~/Downloads
-wget https://cdimage.ubuntu.com/releases/plucky/release/ubuntu-25.04-latest-desktop-arm64.iso
-wget https://cdimage.ubuntu.com/releases/noble/release/ubuntu-24.04.3-desktop-arm64.iso
+wget https://cdimage.ubuntu.com/releases/25.10/release/ubuntu-25.10-desktop-arm64.iso
 
 cd ~/build-roc-rk3328-cc/ubuntu-uefi
-Plugin usb3 stick to PC.
+Plugin USB3 1TB SSD to PC.
 sudo ./mkusb3stick.sh
 sudo mkfs.vfat /dev/sda1
 sudo fdisk -l /dev/sda
 sudo mount /dev/sda1 /mnt
-sudo 7z x ~/Downloads/ubuntu-25.04-latest-desktop-arm64.iso -o/mnt && sync
-sudo cp ~/build-roc-rk3328-cc/linux/linux/tmp/boot/dtb/rockchip/rk3328-roc-cc.dtb /mnt/casper/dtbs
-sudo vi /mnt/boot/grub/grub.cfg ( change to:
-menuentry "Try or Install Ubuntu" {
-        set gfxpayload=keep
-        linux   /casper/vmlinuz $cmdline  --- quiet splash console=tty0
-        initrd  /casper/initrd
-        devicetree /casper/dtbs/rk3328-roc-cc.dtb
-}
-)
-sync; sudo umount /mnt;
-Eject usb3 stick from PC.
+sudo 7z x ~/Downloads/ubuntu-25.10-desktop-arm64.iso -o/mnt && sync && sudo umount /mnt
+Eject USB3 1TB SSD from PC.
 
 Plugin sdcard to PC.
 sudo ./mkuboot.sh
 Eject sdcard from PC.
 
 ------------------------------------------------------------------------
-Install ubuntu from usb3 stick ubuntu iso to sdcard.
-NOTE: To minimize EMI interference, put usb3 stick to roc-rk3328-cc USB3 socket.
-      Put keyboard mouse to roc-rk3328-cc bottom USB2 socket with USB2 extention cable.
+Install ubuntu from USB3 1TB SSD ubuntu iso to sdcard.
+NOTE: To minimize EMI interference, put USB3 1TB SSD to roc-rk3328-cc top USB2 socket.
+      Put keyboard mouse to roc-rk3328-cc USB3 socket with USB2 extention cable.
 ------------------------------------------------------------------------
 
-Plugin sdcard, usb3 stick and ethernet cable to roc-rk3328-cc. Power on roc-rk3328-cc.
+Plugin sdcard, USB3 1TB SSD and ethernet cable to roc-rk3328-cc. Power on roc-rk3328-cc.
 
-If something went wrong shows on screen click close, then click Install Release Icon.
-Double click Install Ubuntu LTS icon.
-Manual Installation. boot loader mmcblk1. Free space. + mount / ok.
+Click Install Release Icon.
+Manual Installation. boot loader select mmcblk1. Free space. + mount / ok.
 Click Install now.
-Contine till finished. Restart. Remove usb3 stick from roc-rk3328-cc.
+Contine till finished. Restart. Remove USB3 1TB SSD from roc-rk3328-cc.
 
 Plugin sdcard to PC.
 sudo fdisk -l /dev/sda
@@ -59,17 +50,14 @@ set menu_color_normal=white/black
 set menu_color_highlight=white/green
 
 menuentry "Boot UUID" {
-    search --no-floppy --fs-uuid --set=root f6007ae7-470d-4625-9f77-8447fdbfb4d1
-    echo    'Loading Linux 6.14.0-35-generic ...'
-    linux /boot/vmlinuz-6.14.0-35-generic root=LABEL=rootfs rootwait rw rootdelay=10
+    search --no-floppy --fs-uuid --set=root 7cb60eec-490c-412a-b66c-992899bfb46a
+    echo    'Loading Linux 6.17.0-6-generic ...'
+    linux /boot/vmlinuz-6.17.0-6-generic root=LABEL=rootfs rootwait rw rootdelay=10
     echo    'Loading initial ramdisk ...'
-    initrd /boot/initrd.img-6.14.0-35-generic
-    devicetree /boot/dtb/rockchip/rk3328-roc-cc.dtb
+    initrd /boot/initrd.img-6.17.0-6-generic
 }
 )
 change above UUID accordingly.
-sudo cp -r ~/build-roc-rk3328-cc/linux/linux/tmp/boot/dtb /mnt/boot
-cd
 sync; sudo umount /mnt;
 Eject sdcard from PC.
 
@@ -86,20 +74,19 @@ sudo apt upgrade
 sudo apt dist-upgrade
 sync
 free
-sudo reboot
 
 Check if Ubuntu is running UEFI mode:
 ls /sys/firmware/efi
 
 sudo apt install flex bison libelf-dev libssl-dev build-essential libncurses-dev git speedtest-cli glmark2-es2-wayland mpv ffmpeg python3-pip python3-setuptools pandoc pavucontrol zip rfkill vsftpd vlc vlc-plugin-video-output
 
-speedtest-cli
+speedtest-cli --secure
 glmark2-es2-wayland
 
 aplay -l
 pavucontrol  ( select hdmi as default )
 
-firefox -> youtube -> search YmDNhi07_Ho
+firefox -> youtube -> search YmDNhi07_Ho  ( don't run firfox. 4GB ram is too small )
 
 Do follows on PC, then ftp swan.mp4 to roc-rk3328-cc.
 (
@@ -113,3 +100,9 @@ cd ../
 mpv --hwdec=auto-copy swan.mp4
 ffplay swan.mp4
 cvlc --gl=wgl --glconv=any swan.mp4
+
+Plugin ASUS USB-BT500 bluetooth usb dongle to roc-rk3328-cc usb3 socket.
+sudo rfkill list
+hciconfig hci0
+hcitool dev
+hciconfig -a

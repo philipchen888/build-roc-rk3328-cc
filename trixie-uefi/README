@@ -1,18 +1,18 @@
-Build bookworm-uefi sdcard image for roc-rk3328-cc:
+Build trixie-uefi sdcard image for roc-rk3328-cc:
 
 Note: Keyboard needs to have usb extention plugin to usb3 socket.
       Plugin USB3 1TB SSD to top usb2 socket.
 
-There is no edk2-rk3328, so we use fedora-40 as edk2-rk3328 to install debian-12.11.0-arm64-netinst.iso to roc-rk3328-cc.
+There is no edk2-rk3328, so we use fedora-40 as edk2-rk3328 to install debian-13.1.0-arm64-netinst.iso to roc-rk3328-cc.
 
 cd ~/Downloads
 wget https://archives.fedoraproject.org/pub/archive/fedora/linux/releases/40/Workstation/aarch64/images/Fedora-Workstation-40-1.14.aarch64.raw.xz
-wget https://mirror.us.mirhosting.net/debian-cd/12.11.0/arm64/iso-cd/debian-12.11.0-arm64-netinst.iso
+wget https://get.debian.org/images/release/current/arm64/iso-cd/debian-13.1.0-arm64-netinst.iso
 
-wget http://http.us.debian.org/debian/dists/bookworm/main/installer-arm64/current/images/netboot/debian-installer/arm64/linux
-wget http://http.us.debian.org/debian/dists/bookworm/main/installer-arm64/current/images/netboot/debian-installer/arm64/initrd.gz
+wget http://http.us.debian.org/debian/dists/trixie/main/installer-arm64/current/images/netboot/debian-installer/arm64/linux
+wget http://http.us.debian.org/debian/dists/trixie/main/installer-arm64/current/images/netboot/debian-installer/arm64/initrd.gz
 
-cd ~/build-roc-rk3328-cc/bookworm-uefi
+cd ~/build-roc-rk3328-cc/trixie-uefi
 Plugin sdcard to PC. 
 sudo ./mksdcardimg.sh
 sudo mkfs.vfat /dev/sda1
@@ -25,7 +25,7 @@ sudo resize2fs /dev/sda2
 sudo mount /dev/sda2 /mnt
 cd /mnt
 sudo \rm -rf efi dtb-* init* lost+found symvers* System* vmlinuz* .vmlinuz* config* dtb
-sudo 7z x ~/Downloads/debian-12.11.0-arm64-netinst.iso; sync;
+sudo 7z x ~/Downloads/debian-13.1.0-arm64-netinst.iso; sync;
 sudo cp ~/Downloads/linux .
 sudo cp ~/Downloads/initrd.gz .
 sudo chmod 755 loader/entries
@@ -44,44 +44,43 @@ cd
 sync; sudo umount /mnt;
 Eject sdcard from PC.
 
-Install bookworm to USB3 1TB SSD:
+Install trixie to USB3 1TB SSD:
 Plugin sdcard, USB3 1TB SSD  and ethernet cable to roc-rk3328-cc. Power on roc-rk3328-cc.
 
-loading missing firmware? No
 Set User name: linaro
 Partition ( Manual, select USB3 1TB SSD, create empty yes, select free, auto partion, all, finish, Yes )
 Select debian desktop and gnome in addition to ssh and standard system utilities.
 
 Force GRUB to install to the EFI ( Yes )
 Update NVMRAM to boot Debian ( Yes )
-Stuck at Unable to install GRUB in dummy.
-Continue without bootloader. Power off roc-rk3328-cc when installation completed. Remove sdcard.
+Power off roc-rk3328-cc when installation completed. Remove sdcard.
 
 Plugin USB3 1TB SSD to PC.
 sudo fdisk -l /dev/sda
-sudo e2label /dev/sda2 rootfs
-sudo blkid /dev/sda1 ( write down UUID )
+sudo e2label /dev/sda3 rootfs
 sudo blkid /dev/sda2 ( write down UUID )
-sudo mount /dev/sda2 /mnt
+sudo blkid /dev/sda3 ( write down UUID )
+sudo mount /dev/sda3 /mnt
 ll /mnt/boot
 sudo touch /mnt/boot/grub/grub.cfg
-sudo vi /mnt/boot/grub/grub.cfg ( add
+sudo vi /mnt/boot/grub/grub.cfg ( delete everything, add
 set timeout=5
 set default="Boot UUID"
 set menu_color_normal=white/black
 set menu_color_highlight=white/green
+set root=(usb0,gpt3)
 
 menuentry "Boot UUID" {
-    search --no-floppy --fs-uuid --set=root 05af6e2e-5f36-4b78-81b7-8fe5f512b38a
-    echo    'Loading Linux 6.1.0-40-arm64 ...'
-    linux /boot/vmlinuz-6.1.0-40-arm64 root=LABEL=rootfs rootwait rw rootdelay=10
+    search --no-floppy --fs-uuid --set=root --hint='usb0,gpt3' b2501488-ca2f-4700-baa6-cc1a6b5dd377
+    echo    'Loading Linux vmlinuz-6.12.48+deb13-arm64 ...'
+    linux /boot/vmlinuz-6.12.48+deb13-arm64 root=LABEL=rootfs rootwait rw rootdelay=10
     echo    'Loading initial ramdisk ...'
-    initrd /boot/initrd.img-6.1.0-40-arm64
+    initrd /boot/initrd.img-6.12.48+deb13-arm64
 }
 )
 change above UUID accordingly.
 sync; sudo umount /mnt;
-sudo mount /dev/sda1 /mnt
+sudo mount /dev/sda2 /mnt
 sudo vi /mnt/EFI/debian/grub.cfg ( change hd0 to usb0 )
 sync; sudo umount /mnt;
 Eject USB3 1TB SSD from PC.
@@ -98,6 +97,8 @@ sync
 reboot
 
 sudo apt install net-tools openssh-server pulseaudio-utils
+sudo systemctl start ssh.service
+sudo systemctl enable ssh.service
 sudo ifconfig
 df .
 uname -a
