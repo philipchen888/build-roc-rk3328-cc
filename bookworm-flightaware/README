@@ -8,7 +8,7 @@ Parts required:
 Input files: ../uboot/out/idbloader.img
              ../uboot/out/uboot.img
              ../uboot/out/trust.img
-             ../linux/out/boot.img
+             ../rootfs-bookworm/linaro-esp.img
              ../rootfs-bookworm/linaro-rootfs.img
 
 cd ~/build-roc-rk3328-cc/bookworm-flightaware
@@ -16,8 +16,7 @@ Plugin sdcard to PC.
 sudo ./mksdcardimg.sh
 sudo mount /dev/sda5 /mnt
 cp ./flightaware/* /mnt/home/linaro
-sync
-sudo umount /mnt
+sync; sudo umount /mnt;
 Eject sdcard from PC.
 
 Plugin sdcard and ethernet cable to SBC.
@@ -36,6 +35,8 @@ sudo apt upgrade
 sync
 free
 glxinfo | grep OpenGL
+Check if Debian is running UEFI mode:
+ls /sys/firmware/efi
 Check display mode: ( wayland or x11 )
 echo $XDG_SESSION_TYPE
 

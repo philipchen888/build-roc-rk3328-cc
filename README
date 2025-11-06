@@ -98,16 +98,10 @@ Steps to build ROC-RK3338-CC sdcard image:
 
 17. cd ~/build-roc-rk3328-cc/yocto                 ( Build yocto image )
 
-18. cd ~/build-roc-rk3328-cc/yocto-lxde            ( Build yocto lxde-desktop image )
+18. cd ~/build-roc-rk3328-cc/buildroot             ( Build buildroot image )
 
-19. cd ~/build-roc-rk3328-cc/yocto-xfce            ( Build yocto xfce-desktop image )
+19. cd ~/build-roc-rk3328-cc/bookworm-gpio         ( gpio test in bookworm )
 
-20. cd ~/build-roc-rk3328-cc/buildroot             ( Build buildroot image )
+20. cd ~/build-roc-rk3328-cc/bookworm-flightaware  ( flightaware in bookworm )
 
-21. cd ~/build-roc-rk3328-cc/bullseye-gpio         ( gpio test in bullseye-lxde )
-
-22. cd ~/build-roc-rk3328-cc/bullseye-pn532nfc     ( pn532nfc test in bullseye-lxde )
-
-23. cd ~/build-roc-rk3328-cc/bullseye-flightaware  ( flightaware in bullseye-lxde ) 
-
-24. cd ~/build-roc-rk3328-cc/baremetal-gpio        ( gpio test in baremetal )
+21. cd ~/build-roc-rk3328-cc/baremetal-gpio        ( gpio test in baremetal )
