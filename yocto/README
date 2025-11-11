@@ -10,24 +10,27 @@ Input files: ../uboot/out/idbloader.img
 
    mkdir ${HOME}/download
    mkdir ${HOME}/sstate-cache
-   git clone git://git.yoctoproject.org/poky --depth=1 -b master
-   cd poky
-   git clone git://git.openembedded.org/meta-openembedded.git --depth=1 -b master
-   git clone https://github.com/jonmason/meta-arm.git --depth=1 -b master
-   git clone https://git.yoctoproject.org/meta-rockchip.git --depth=1 -b master
-   vi ./meta-rockchip/recipes-kernel/linux/linux-yocto_%.bbappend ( add
+   mkdir mypoky; cd mypoky;
+   git clone https://github.com/openembedded/bitbake.git -b master
+   rm -rf ~/bitbake-builds
+   python3 bitbake/bin/bitbake-setup settings set default top-dir $PWD && python3 bitbake/bin/bitbake-setup settings set default top-dir-prefix $PWD && python3 bitbake/bin/bitbake-setup settings set default top-dir-name build && python3 bitbake/bin/bitbake-setup settings set default setup-dir $PWD
+
+   rm -rf build config layers
+   python3 bitbake/bin/bitbake-setup init --setup-dir-name $PWD --non-interactive ../patches/roc-rk3328-cc.conf.json roc-rk3328-cc
+   cp ../patches/local.conf ./build/conf
+   cp ../patches/rockchip.wks ./layers/meta-rockchip/wic
+   cp ../patches/hdmi-audio.cfg ./layers/meta-rockchip/recipes-kernel/linux/linux-yocto
+   vi ./layers/meta-rockchip/recipes-kernel/linux/linux-yocto_%.bbappend ( append
    SRC_URI:append:rockchip = " file://hdmi-audio.cfg"
    )
-   source oe-init-build-env
-   cd ../../
-   make apply_patches
+   . ./build/init-build-env
 
-   cd poky; source oe-init-build-env;
    bitbake -s
    bitbake -c cleansstate u-boot linux-yocto core-image-weston clang
    bitbake -k u-boot
-   bitbake -k linux-yocto clang clang-native rust-native
-   bitbake -k core-image-weston
+   bitbake -k clang llvm-native clang-native rust-native
+   bitbake -k linux-yocto
+   bitbake -k llvm core-image-weston
 
    The result is in ./tmp/deploy/images/roc-rk3328-cc/core-image-weston-roc-rk3328-cc.rootfs.wic
 
@@ -99,8 +102,8 @@ su -
 whoami
 glmark2-es2-wayland
 pulseaudio --start
-alsamixer            ( adjust volume )
-aplay -l
+pactl set-sink-volume 0 50%
+
 aplay /home/linaro/yoursong.wav
 mpv --no-video /home/linaro/yoursong.mp3
 mpv -fs /home/linaro/yourvideo.mp4
