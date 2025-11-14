@@ -1,6 +1,8 @@
 Compile uboot:
 
 git clone https://github.com/u-boot/u-boot.git -b master --depth=1
+
+To boot uefi, append UEFI stuff in roc-cc-rk3328_defconfig:
 vi ./u-boot/configs/roc-cc-rk3328_defconfig ( append:
 CONFIG_EFI_PARTITION=y
 CONFIG_PARTITION_TYPE_GUID=y

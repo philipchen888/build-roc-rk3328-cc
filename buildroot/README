@@ -1,14 +1,16 @@
 Build buildroot sdcard image for roc-rk3328-cc:
 
+Note: compile uboot without appending UEFI in defconfig in order to boot extlinux.
+
 Input files: ../uboot/out/idbloader.img
              ../uboot/out/uboot.img
              ../uboot/out/trust.img
              ../linux/out/boot.img
              ../linux/linux/tmp/lib/modules
 
-wget https://buildroot.org/downloads/buildroot-2025.08.tar.gz
-tar -xzf buildroot-2025.08.tar.gz
-mv buildroot-2025.08 buildroot
+wget https://buildroot.org/downloads/buildroot-2025.08.1.tar.gz
+tar -xzf buildroot-2025.08.1.tar.gz
+mv buildroot-2025.08.1 buildroot
 vi ./buildroot/configs/rock4se_defconfig ( change BR2_cortex_a72_a53=y to BR2_cortex_a53=y, delete UBOOT, KERNEL, BR2_DOWNLOAD_FORCE_CHECK_HASHES=y, append ./patches/rk3328_defconfig )
 cp ./patches/roc-rk3328-cc/* ./buildroot/board/radxa/rock4se/
 cd buildroot
@@ -38,19 +40,24 @@ ctl.!default {
 sync; sudo umount /mnt;
 Eject sdcard.
 
-plugin sdcard and ethernet cable to SBC
+Plugin sdcard and ethernet cable to roc-rk3328-cc.
 login:
 username: root
 password: linaro
 
 uname -a
 adduser linaro
+vi /etc/group ( append ,linaro to end of audio and pulse )
+id linaro
 
 date
 aplay -l
 
+su - linaro
+mkdir -p /home/linaro/pulse-runtime
+export PULSE_RUNTIME_PATH=/home/linaro/pulse-runtime
 pulseaudio --start
-pactl set-sink-volume 0 20%
-
-aplay /home/linaro/yoursong.wav
-mpv --no-video /home/linaro/yoursong.mp3
+pactl list short sinks
+pactl set-sink-volume 0 25%
+aplay /home/linaro/solut.wav
+mpv /home/linaro/solut.mp3

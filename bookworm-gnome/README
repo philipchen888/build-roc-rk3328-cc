@@ -59,6 +59,7 @@ ffplay swan.mp4
 cvlc --gl=wgl --glconv=any swan.mp4
 
 sudo rfkill list
+sudo rfkill unblock all
 hciconfig hci0
 hcitool dev
 hciconfig -a
