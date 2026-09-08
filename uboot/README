@@ -1,0 +1,38 @@
+Compile uboot:
+
+\rm -rf u-boot
+git clone https://github.com/u-boot/u-boot.git -b v2025.10 --depth=1
+
+To boot extlinux:
+vi ./u-boot/configs/roc-cc-rk3328_defconfig ( append:
+CONFIG_BOOTMETH_EXTLINUX=y
+CONFIG_BOOTMETH_EXTLINUX_PXE=y
+CONFIG_BOOTSTD=y
+CONFIG_BOOTSTD_FULL=y
+CONFIG_BOOTFLOW=y
+CONFIG_BOOTFLOW_FULL=y
+)
+
+To boot uefi, append UEFI stuff in roc-cc-rk3328_defconfig:
+vi ./u-boot/configs/roc-cc-rk3328_defconfig ( append:
+CONFIG_EFI_PARTITION=y
+CONFIG_PARTITION_TYPE_GUID=y
+CONFIG_CMD_GPT=y
+CONFIG_CMD_PART=y
+CONFIG_CMD_FS_UUID=y
+CONFIG_CMD_FAT=y
+CONFIG_FS_FAT=y
+CONFIG_CMD_MMC=y
+CONFIG_EFI_LOADER=y
+CONFIG_CMD_BOOTEFI=y
+)
+
+make u-boot
+
+The results are in ./out/u-boot.img, idbloader.img, trust.img
+
+Plugin sdcard to PC.
+sudo ./mkuboot.sh
+Eject sdcard from PC.
+
+Plugin sdcard to roc-rk3328-cc.

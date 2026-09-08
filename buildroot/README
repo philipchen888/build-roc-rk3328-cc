@@ -1,0 +1,78 @@
+Build buildroot sdcard image for roc-rk3328-cc.
+
+Input files: ../uboot/out/idbloader.img  ( config to use extlinux )
+             ../uboot/out/uboot.img
+             ../uboot/out/trust.img
+             ../linux/out/boot.img
+             ../linux/linux/tmp/lib/modules
+
+wget https://buildroot.org/downloads/buildroot-2026.05.tar.xz
+tar -xJf buildroot-2026.05.tar.xz
+mv buildroot-2026.05 buildroot
+
+vi ./buildroot/configs/rock4se_defconfig ( change BR2_cortex_a72_a53=y to BR2_cortex_a53=y, delete UBOOT, KERNEL, BR2_DOWNLOAD_FORCE_CHECK_HASHES=y, append ./patches/rk3328_defconfig )
+cp ./patches/roc-rk3328-cc/* ./buildroot/board/radxa/rock4se/
+
+cd buildroot
+\rm -rf .config output
+make clean
+sudo update-alternatives --install /usr/bin/install install /usr/bin/gnuinstall 100
+make rock4se_defconfig
+make
+
+The result is in ./output/images/sdcard.img
+
+Plugin sdcard to PC.
+sudo dd if=./output/images/sdcard.img of=/dev/sda bs=4096 conv=notrunc,fsync
+
+sudo partprobe /dev/sda
+
+sudo mount /dev/sda5 /mnt
+sudo vi /mnt/etc/network/interfaces ( delete everything after iface lo inet loopback )
+sudo vi /mnt/etc/vsftpd.conf ( anonymous_enable=NO, local_enable=YES, write_enable=YES )
+sudo mkdir -p /mnt/lib/modules
+sudo cp -r ../../linux/linux/tmp/lib/modules/* /mnt/lib/modules
+sync; sudo umount /mnt;
+Eject sdcard from PC.
+
+Plugin sdcard and ethernet cable to roc-rk3328-cc.
+login:
+username: root
+password: linaro
+
+ifconfig
+
+ssh root@192.168.86.211
+
+uname -a
+adduser linaro
+vi /etc/group ( append ,linaro to end of audio and pulse )
+id linaro
+
+date
+aplay -l
+
+vi /etc/asound.conf ( add
+pcm.!default {
+    type pulse
+}
+
+ctl.!default {
+    type pulse
+}
+)
+mkdir -p /home/linaro/pulse-runtime
+export PULSE_RUNTIME_PATH=/home/linaro/pulse-runtime
+pulseaudio --start
+pactl list short sinks
+pactl set-sink-volume 0 25%
+
+pulseaudio --start
+pactl list short sinks
+pactl set-sink-volume 0 25%
+aplay /home/linaro/yoursong.wav
+
+pulseaudio --start
+pactl list short sinks
+pactl set-sink-volume 0 25%
+mpv /home/linaro/yoursong.mp3

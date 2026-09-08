@@ -1,0 +1,28 @@
+compile mainline kernel for roc-rk3328-cc:
+
+git clone --depth=1 --branch v6.18 https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+
+vi linux/arch/arm64/boot/dts/rockchip/rk3328-roc.dtsi ( change to:
+&i2c1 {
+        status = "okay";
+
+&uart1 {
+        status = "okay";
+};
+
+&spi0 {
+        status = "okay";
+        spidev@0 {
+                compatible = "cisco,spi-petra";
+                reg = <0>;
+                spi-max-frequency = <10000000>;
+        };
+};
+
+&pwm2 {
+        status = "okay";
+};
+)
+
+make kernel
+make postbuildkernel        ( run this only when using extlinux boot )
