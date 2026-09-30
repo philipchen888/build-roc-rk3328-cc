@@ -34,7 +34,7 @@ Steps to build roc-rk3328-cc sdcard image:
    make u-boot
 
 4. cd ~/build-roc-rk3328-cc/linux ( Compile mainline kernel )
-   git clone --depth=1 --branch v6.18 https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+   git clone --depth=1 --branch v6.19 https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
    vi linux/arch/arm64/boot/dts/rockchip/rk3328-roc.dtsi ( change i2c1 uart1 spi0 pwm2 )
    make kernel
 
@@ -109,7 +109,7 @@ Steps to build roc-rk3328-cc sdcard image:
 
 17. cd ~/build-roc-rk3328-cc/android       ( Build android image )
 
-18. cd ~/build-roc-rk3328-cc/bookworm-flightaware  ( flightaware in bookworm )
+18. cd ~/build-roc-rk3328-cc/trixie-flightaware  ( flightaware in bookworm )
 
 19. cd ~/build-roc-rk3328-cc/yocto         ( Build yocto desktop image )
 

@@ -31,7 +31,7 @@ Plugin sdcard, USB3 1TB SSD to UDB3 slot of roc-rk3328-cc, usb3 stick and ethern
 Select install
 Double click Install Ubuntu LTS icon.
 Erase disk.
-Contine till finished. Restart.
+Contine till finished. Restart.         ( It could take 6 hours to install ubuntu )
 
 Remove USB3 1TB SSD from roc-rk3328-cc.
 Plugin usb3 stick to PC.
@@ -42,6 +42,15 @@ sudo blkid /dev/sda2 ( write down UUID )
 sudo mount /dev/sda2 /mnt
 sudo cp -r ../linux/linux/tmp/lib/modules/* /mnt/lib/modules
 sudo cp -r ../linux/linux/tmp/boot/* /mnt/boot
+
+mkdir tmp1; cd tmp1;
+sudo unmkinitramfs /mnt/boot/initrd.img-6.17.0-41-generic .
+sudo cp -r ../../linux/linux/tmp/lib/modules/* lib/modules/
+\rm -f ../initrd-patched
+sudo sh -c 'find . | cpio -o -H newc | zstd > ../initrd-patched'
+cd ../
+
+sudo cp initrd-patched /mnt/boot
 ls -la /mnt/boot
 sudo touch /mnt/boot/grub/grub.cfg
 sudo vi /mnt/boot/grub/grub.cfg ( delete everything, add
@@ -52,10 +61,10 @@ set menu_color_highlight=white/green
 
 menuentry "Boot UUID" {
     search --no-floppy --fs-uuid --set=root d9f66b23-9b3d-4c90-9f58-ccf99c0e88fa
-    echo    'Loading Linux 6.18.0-dirty ...'
-    linux /boot/vmlinuz-6.18.0-dirty root=LABEL=rootfs rootwait rw rootdelay=50
+    echo    'Loading Linux 6.19.0-dirty ...'
+    linux /boot/vmlinuz-6.19.0-dirty root=LABEL=rootfs rootwait rw rootdelay=50
     echo    'Loading initial ramdisk ...'
-    initrd /boot/initrd.img-6.17.0-41-generic
+    initrd /boot/initrd-patched
     devicetree /boot/dtb/rockchip/rk3328-roc-cc.dtb
 }
 )
@@ -77,6 +86,13 @@ lsb_release -a
 sudo dpkg-reconfigure tzdata
 sudo dpkg-reconfigure locales
 date
+sudo apt update
+apt-mark showmanual | grep -E 'linux|kernel|flash'
+apt-cache depends linux-generic-hwe-24.04
+sudo apt remove linux-generic-hwe-24.04 flash-kernel
+sudo dpkg --configure -a
+sudo apt -f install
+sudo apt autoremove
 sudo apt update; sudo apt upgrade -y; sudo apt dist-upgrade -y;
 cd /lib/firmware/rtl_bt
 sudo zstd -d rtl8761bu_fw.bin.zst
@@ -85,9 +101,22 @@ cd
 sync
 free
 sudo update-initramfs -u -k $(uname -r)
-sudo vi /boot/grub/grub.cfg ( change to:
-   initrd /boot/initrd.img-6.18.0-dirty
+sudo vi /boot/grub/grub.cfg ( delete everything, add
+set timeout=5
+set default="Boot UUID"
+set menu_color_normal=white/black
+set menu_color_highlight=white/green
+
+menuentry "Boot UUID" {
+    search --no-floppy --fs-uuid --set=root d9f66b23-9b3d-4c90-9f58-ccf99c0e88fa
+    echo    'Loading Linux 6.19.0-dirty ...'
+    linux /boot/vmlinuz-6.19.0-dirty root=LABEL=rootfs rootwait rw rootdelay=50
+    echo    'Loading initial ramdisk ...'
+    initrd /boot/initrd.img-6.19.0-dirty
+    devicetree /boot/dtb/rockchip/rk3328-roc-cc.dtb
+}
 )
+Note: update above UUID, devicetree accordingly.
 sync
 sudo reboot
 
@@ -111,9 +140,6 @@ glmark2-es2-wayland
 aplay -l
 pavucontrol ( set hdmi as default )
 
-# sudo add-apt-repository ppa:mozillateam/ppa
-# sudo apt update; sudo apt upgrade -y;
-# sudo apt install firefox-esr
 # firefox -> youtube.com -> search YmDNhi07_Ho
 
 Do follows on PC, then ftp swan.mp4 to roc-rk3328-cc.
@@ -125,7 +151,7 @@ cd ../
 ~/yt-dlp/yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]' 3qrKjywjo7Q -o swan.mp4 --postprocessor-args " -r 10 -c:v libx264 -b:v 2M -c:a copy"
 )
 
-mpv --hwdec=auto-copy swan.mp4
+mpv swan.mp4
 ffplay -autoexit swan.mp4
 cvlc --gl=wgl --glconv=any swan.mp4
 

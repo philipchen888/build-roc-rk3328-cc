@@ -20,5 +20,5 @@ EOF
 dd if=../uboot/out/idbloader.img of=${BOOT} bs=4096 seek=8 conv=notrunc,fsync
 dd if=../uboot/out/uboot.img of=${BOOT} bs=4096 seek=2048 conv=notrunc,fsync
 dd if=../uboot/out/trust.img of=${BOOT} bs=4096 seek=3072 conv=notrunc,fsync
-dd if=../rootfs-bookworm/linaro-esp.img of=${BOOT} bs=4096 seek=4096 conv=notrunc,fsync
-dd if=../rootfs-bookworm/linaro-rootfs.img of=${BOOT} bs=4096 seek=135168 conv=notrunc,fsync
+dd if=../rootfs-trixie/linaro-esp.img of=${BOOT} bs=4096 seek=4096 conv=notrunc,fsync
+dd if=../rootfs-trixie/linaro-rootfs.img of=${BOOT} bs=4096 seek=135168 conv=notrunc,fsync
