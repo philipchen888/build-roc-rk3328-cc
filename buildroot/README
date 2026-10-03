@@ -10,7 +10,7 @@ wget https://buildroot.org/downloads/buildroot-2026.05.tar.xz
 tar -xJf buildroot-2026.05.tar.xz
 mv buildroot-2026.05 buildroot
 
-vi ./buildroot/configs/rock4se_defconfig ( change BR2_cortex_a72_a53=y to BR2_cortex_a53=y, delete UBOOT, KERNEL, BR2_DOWNLOAD_FORCE_CHECK_HASHES=y, append ./patches/rk3328_defconfig )
+vi ./buildroot/configs/rock4se_defconfig ( change BR2_cortex_a72_a53=y to BR2_cortex_a53=y, delete UBOOT, KERNEL, BR2_GLOBAL_PATCH_DIR, BR2_DOWNLOAD_FORCE_CHECK_HASHES=y, append ./patches/rk3328_defconfig )
 cp ./patches/roc-rk3328-cc/* ./buildroot/board/radxa/rock4se/
 
 cd buildroot

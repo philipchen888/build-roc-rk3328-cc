@@ -42,15 +42,6 @@ sudo blkid /dev/sda2 ( write down UUID )
 sudo mount /dev/sda2 /mnt
 sudo cp -r ../linux/linux/tmp/lib/modules/* /mnt/lib/modules
 sudo cp -r ../linux/linux/tmp/boot/* /mnt/boot
-
-mkdir tmp1; cd tmp1;
-sudo unmkinitramfs /mnt/boot/initrd.img-6.17.0-41-generic .
-sudo cp -r ../../linux/linux/tmp/lib/modules/* lib/modules/
-\rm -f ../initrd-patched
-sudo sh -c 'find . | cpio -o -H newc | zstd > ../initrd-patched'
-cd ../
-
-sudo cp initrd-patched /mnt/boot
 ls -la /mnt/boot
 sudo touch /mnt/boot/grub/grub.cfg
 sudo vi /mnt/boot/grub/grub.cfg ( delete everything, add
@@ -64,7 +55,7 @@ menuentry "Boot UUID" {
     echo    'Loading Linux 6.19.0-dirty ...'
     linux /boot/vmlinuz-6.19.0-dirty root=LABEL=rootfs rootwait rw rootdelay=50
     echo    'Loading initial ramdisk ...'
-    initrd /boot/initrd-patched
+    initrd /boot/initrd.img-6.17.0-41-generic
     devicetree /boot/dtb/rockchip/rk3328-roc-cc.dtb
 }
 )
@@ -101,22 +92,9 @@ cd
 sync
 free
 sudo update-initramfs -u -k $(uname -r)
-sudo vi /boot/grub/grub.cfg ( delete everything, add
-set timeout=5
-set default="Boot UUID"
-set menu_color_normal=white/black
-set menu_color_highlight=white/green
-
-menuentry "Boot UUID" {
-    search --no-floppy --fs-uuid --set=root d9f66b23-9b3d-4c90-9f58-ccf99c0e88fa
-    echo    'Loading Linux 6.19.0-dirty ...'
-    linux /boot/vmlinuz-6.19.0-dirty root=LABEL=rootfs rootwait rw rootdelay=50
-    echo    'Loading initial ramdisk ...'
-    initrd /boot/initrd.img-6.19.0-dirty
-    devicetree /boot/dtb/rockchip/rk3328-roc-cc.dtb
-}
+sudo vi /boot/grub/grub.cfg ( change to
+initrd /boot/initrd.img-6.19.0-dirty
 )
-Note: update above UUID, devicetree accordingly.
 sync
 sudo reboot
 

@@ -109,7 +109,7 @@ Steps to build roc-rk3328-cc sdcard image:
 
 17. cd ~/build-roc-rk3328-cc/android       ( Build android image )
 
-18. cd ~/build-roc-rk3328-cc/trixie-flightaware  ( flightaware in bookworm )
+18. cd ~/build-roc-rk3328-cc/trixie-flightaware  ( Build flightaware image )
 
 19. cd ~/build-roc-rk3328-cc/yocto         ( Build yocto desktop image )
 
