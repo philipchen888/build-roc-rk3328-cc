@@ -107,22 +107,20 @@ Steps to build roc-rk3328-cc sdcard image:
     sudo cp ./rtlbt/* /mnt/lib/firmware/rtl_bt && sync && sudo umount /mnt
     Eject usb3 stick from PC.
 
-17. cd ~/build-roc-rk3328-cc/android       ( Build android image )
+17. cd ~/build-roc-rk3328-cc/trixie-flightaware  ( Build flightaware image )
 
-18. cd ~/build-roc-rk3328-cc/trixie-flightaware  ( Build flightaware image )
+18. cd ~/build-roc-rk3328-cc/yocto         ( Build yocto desktop image )
 
-19. cd ~/build-roc-rk3328-cc/yocto         ( Build yocto desktop image )
+19. cd ~/build-roc-rk3328-cc/buildroot     ( Build buildroot image )
 
-20. cd ~/build-roc-rk3328-cc/buildroot     ( Build buildroot image )
+20. cd ~/build-roc-rk3328-cc/bookworm-gpio ( Build bookworm gpio tests )
 
-21. cd ~/build-roc-rk3328-cc/bookworm-gpio ( Build bookworm gpio tests )
+21. cd ~/build-roc-rk3328-cc/fedora        ( Build fedora image )
 
-22. cd ~/build-roc-rk3328-cc/fedora        ( Build fedora image )
+22. cd ~/build-roc-rk3328-cc/ubuntu-uefi   ( Build ubuntu-uefi image )
 
-23. cd ~/build-roc-rk3328-cc/ubuntu-uefi   ( Build ubuntu-uefi image )
+23. cd ~/build-roc-rk3328-cc/bookworm-uefi ( Build bookworm-uefi image )
 
-24. cd ~/build-roc-rk3328-cc/bookworm-uefi ( Build bookworm-uefi image )
+24. cd ~/build-roc-rk3328-cc/trixie-uefi   ( Build trixie-uefi image )
 
-25. cd ~/build-roc-rk3328-cc/trixie-uefi   ( Build trixie-uefi image )
-
-26. cd ~/build-roc-rk3328-cc/forky-uefi    ( Build forky-uefi image )
+25. cd ~/build-roc-rk3328-cc/forky-uefi    ( Build forky-uefi image )

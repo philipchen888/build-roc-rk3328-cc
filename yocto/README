@@ -18,19 +18,16 @@ Input files: ../uboot/out/idbloader.img
    rm -rf build config layers
    python3 bitbake/bin/bitbake-setup init --setup-dir-name $PWD --non-interactive ../patches/roc-rk3328-cc.conf.json roc-rk3328-cc
    cp ../patches/local.conf ./build/conf
-   cp ../patches/rockchip.wks ./layers/meta-rockchip/wic
-   cp ../patches/hdmi-audio.cfg ./layers/meta-rockchip/recipes-kernel/linux/linux-yocto
-   vi ./layers/meta-rockchip/recipes-kernel/linux/linux-yocto_%.bbappend ( append
-   SRC_URI:append:rockchip = " file://hdmi-audio.cfg"
-   )
+   cp ../patches/rockchip.wks ./layers/meta-rockchip/files/wic
    . ./build/init-build-env
 
+   echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
    bitbake -s
    bitbake -c cleansstate u-boot linux-yocto core-image-weston clang
    bitbake -k u-boot
    bitbake -k clang llvm-native clang-native rust-native
    bitbake -k linux-yocto
-   bitbake -k llvm core-image-weston
+   bitbake -k core-image-weston
 
    The result is in ./tmp/deploy/images/roc-rk3328-cc/core-image-weston-roc-rk3328-cc.rootfs.wic
 
@@ -38,7 +35,6 @@ Input files: ../uboot/out/idbloader.img
    sudo dd if=./tmp/deploy/images/roc-rk3328-cc/core-image-weston-roc-rk3328-cc.rootfs.wic of=/dev/sda bs=4096 conv=notrunc,fsync
    sudo mount /dev/sda5 /mnt
    sudo cp -r ../../../linux/linux/tmp/lib/modules/* /mnt/lib/modules
-   sudo vi /mnt/etc/network/interfaces ( delete everything after iface lo inet loopback )
    sudo vi /mnt/etc/xdg/weston/weston.ini ( delete everything, add
    [core]
    xwayland=true
@@ -101,9 +97,9 @@ In weston desktop:
 su -
 whoami
 glmark2-es2-wayland
-pulseaudio --start
-pactl set-sink-volume 0 50%
+
+amixer set Master 50%
 
 aplay /home/linaro/yoursong.wav
-mpv --no-video /home/linaro/yoursong.mp3
+mpv /home/linaro/yoursong.mp3
 mpv -fs /home/linaro/yourvideo.mp4
